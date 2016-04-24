@@ -1,4 +1,4 @@
-package com.main;
+package com.model;
 
 import com.fathzer.soft.javaluator.AbstractEvaluator;
 import com.fathzer.soft.javaluator.BracketPair;

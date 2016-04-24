@@ -1,4 +1,4 @@
-package com.main;
+package com.helpers;
 
 import javax.faces.bean.ManagedProperty;
 

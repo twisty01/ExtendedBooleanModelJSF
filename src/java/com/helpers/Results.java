@@ -1,5 +1,6 @@
-package com.main;
+package com.helpers;
 
+import com.model.Document;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
