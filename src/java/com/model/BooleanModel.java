@@ -16,7 +16,6 @@ public class BooleanModel {
     public final String DATA_ROOT_PATH = "../corpus/data/";
     public final String STOP_WORDS_PATH = "../stop_words.txt";
 
-    public int kokos = 10;
     public ArrayList<String> stopWords = new ArrayList();
     
     public HashSet<String> documents;
