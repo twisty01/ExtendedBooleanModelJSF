@@ -9,15 +9,16 @@
     <h:body>
         <h1>Extended Boolean Model</h1>
 
-        <h:form id="mainForm">
+        <h:form id ="f1">
             <h:outputLabel value="Enter expression: " />
             <h:inputText value="#{booleanModel.expression}" />       
-            
-            <h:commandButton value="Search" type="submit" action="#{booleanModel.evaulate()}" />
-          
-            <h:outputLabel value="Lumberjack algorithm: " id ="lumberjack"/>
-            <h:selectBooleanCheckbox value="true" />
-            
+
+            <h:commandButton value="Search" type="submit" 
+                             action="#{booleanModel.evaulate(f1.lumberjack)}" />
+
+            <h:selectBooleanCheckbox value="false" id ="lumberjack" />
+            <h:outputLabel value="Lumberjack algorithm" />
+
             <h:dataTable value="#{booleanModel.results}" var="document">
 
                 <h:column>    				
@@ -26,7 +27,7 @@
                 </h:column>
                 <h:column>
                     <f:facet name="header">Path</f:facet>
-                        #{document.path}
+                    <a href="#{document.path}" >#{document.path}</a>
                 </h:column>
                 <h:column>
                     <f:facet name="header">Score</f:facet>
