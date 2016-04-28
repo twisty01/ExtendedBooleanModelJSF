@@ -1,15 +1,14 @@
 package com.model;
 
 import com.porter.Stemmer;
-import java.time.Instant;
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
-import java.util.Date;
-import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Hashtable;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Scanner;
 import javafx.util.Pair;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.SessionScoped;
@@ -23,8 +22,8 @@ public class BooleanModel {
 
     private HashSet<String> stopWords;
     private List<String> documents;
-    private HashMap<String, List< Pair<String, Float> > > terms;
-    
+    private HashMap<String, List< Pair<String, Integer>>> terms;
+
     private ExpressionEvaluator evaulator = new ExpressionEvaluator();
     private Stemmer stemmer = new Stemmer();
 
@@ -34,33 +33,35 @@ public class BooleanModel {
 
     // show results in html
     private ArrayList<Document> results = new ArrayList<>();
-    
-    public void initialize(){
+
+    public void initialize() {
         stopWords = new HashSet<>();
         terms = new HashMap<>();
         documents = DocumentLoader.listf(DATA_ROOT_PATH);
-        for ( String s : documents){
+        for (String s : documents) {
             processDocument(s);
         }
     }
-    
-    private void processDocument(String s){
-        
-        
-    }
-    
-    private void processTerm(String s){
-        
+
+    private void processDocument(String path) { 
+        try {
+            Scanner scn = new Scanner(new File(path)).useDelimiter("[^a-zA-Z]+| <.*>");
+            while (scn.hasNext()) {
+                String term = scn.next();
+                // todo
+            }
+            scn.close();
+        } catch (FileNotFoundException ex) {
+        }
+
     }
 
     public void evaulate(boolean lumberjack) {
         results.add(new Document("placeholder1", "link1", -1));
         results.add(new Document("placeholder2", "link2", -2));
     }
-    
-    
-    
-   // GETTERS AND SETTERS
+
+    // GETTERS AND SETTERS
     public ArrayList<Document> getResults() {
         return results;
     }
@@ -76,14 +77,13 @@ public class BooleanModel {
     public void setExpression(String expression) {
         this.expression = expression;
     }
-    
-       public void setDuration(long duration) {
+
+    public void setDuration(long duration) {
         this.duration = duration;
     }
 
     public long getDuration() {
         return duration;
     }
-    
 
 }
