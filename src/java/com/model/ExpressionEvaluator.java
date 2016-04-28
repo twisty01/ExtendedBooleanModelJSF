@@ -6,7 +6,7 @@ import com.fathzer.soft.javaluator.Operator;
 import com.fathzer.soft.javaluator.Parameters;
 import java.util.Iterator;
 
-public class BooleanExpressionParser extends AbstractEvaluator<String> {
+public class ExpressionEvaluator extends AbstractEvaluator<String> {
 
     final static Operator AND = new Operator("&&", 2, Operator.Associativity.LEFT, 2);
     final static Operator OR = new Operator("||", 2, Operator.Associativity.LEFT, 1);
@@ -20,7 +20,7 @@ public class BooleanExpressionParser extends AbstractEvaluator<String> {
         parameters.addExpressionBracket(BracketPair.PARENTHESES);
     }
 
-    public BooleanExpressionParser() {
+    public ExpressionEvaluator() {
         super(parameters);
     }
 
