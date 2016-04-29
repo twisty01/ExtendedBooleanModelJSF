@@ -94,5 +94,16 @@ public class BooleanModel {
     public long getDuration() {
         return duration;
     }
+    
+    // -------------- process words -------------------
+    public boolean isStopWord(String word){
+        return stopWords.contains(word);
+    }
+    
+    public String wordToTerm(String word){
+        stemmer.add(word.toCharArray(), word.length());
+        stemmer.stem();
+        return stemmer.toString();
+    }
 
 }
