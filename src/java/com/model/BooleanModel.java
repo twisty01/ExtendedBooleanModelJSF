@@ -9,6 +9,8 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Scanner;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javafx.util.Pair;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.SessionScoped;
@@ -43,16 +45,23 @@ public class BooleanModel {
         }
     }
 
-    private void processDocument(String path) { 
+    private void processDocument(String path) {
+        File file = new File(path);
+        Scanner scn = null;
         try {
-            Scanner scn = new Scanner(new File(path)).useDelimiter("[^a-zA-Z]+| <.*>");
-            while (scn.hasNext()) {
-                String term = scn.next();
-                // todo
-            }
-            scn.close();
+            scn = new Scanner(file).useDelimiter("[^a-zA-Z]+| <.*>");
         } catch (FileNotFoundException ex) {
+            ex.printStackTrace();
         }
+        while (scn.hasNext()) {
+            String term = scn.next();
+
+        }
+        scn.close();
+        
+        // w = tf * idf = tf * log2(n / df);
+        // tf = freq_term_in_the_doc / max_term_freq_in_all_docs;
+        // df = num_of_docs_containing_term;
 
     }
 
