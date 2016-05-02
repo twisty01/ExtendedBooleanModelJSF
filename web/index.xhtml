@@ -21,17 +21,13 @@
 
             <h:dataTable value="#{booleanModel.results}" var="document">
 
-                <h:column>    				
-                    <f:facet name="header">Name</f:facet>    				
-                        #{document.name}
-                </h:column>
                 <h:column>
                     <f:facet name="header">Path</f:facet>
                     <a href="#{document.path}" >#{document.path}</a>
                 </h:column>
                 <h:column>
                     <f:facet name="header">Score</f:facet>
-                        #{document.score}
+                        #{document.weight}
                 </h:column>
 
             </h:dataTable>

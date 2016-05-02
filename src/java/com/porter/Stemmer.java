@@ -44,6 +44,21 @@ import java.io.*;
  */
 public class Stemmer {
 
+    // --------------- MY CHANGES FOR EASY USE --------------------
+    private static Stemmer stemmer = null;
+    public static String stem(String word) {
+        if (stemmer == null) {
+            stemmer = new Stemmer();
+        } else {
+            stemmer.b = new char[INC];
+            stemmer.i = 0;
+            stemmer.i_end = 0;
+        }
+        stemmer.add(word.toCharArray(), word.length());
+        stemmer.stem();
+        return stemmer.toString();
+    }
+    // --------------- MY CHANGES FOR EASY USE --------------------
     private char[] b;
     private int i, /* offset into b */
             i_end, /* offset to end of stemmed word */

@@ -1,48 +1,62 @@
 package com.model;
 
+import java.util.Objects;
+
 public class Document implements Comparable<Document> {
 
-    private String name;
     private String path;
-    private int score;
+    private float weight;
 
-    public Document(String name, String path, int score) {
-        this.name = name;
+    public Document(String path, float weight) {
         this.path = path;
-        this.score = score;
+        this.weight = weight;
     }
 
     public Document() {
-        this("", "", 0);
+        this("", 0);
     }
 
     @Override
     public int compareTo(Document o) {
-        return score - o.getScore();
+        return (int) (weight - o.getWeight());
     }
 
-    public String getName() {
-        return name;
+    @Override
+    public int hashCode() {
+        int hash = 5;
+        hash = 23 * hash + Objects.hashCode(this.path);
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final Document other = (Document) obj;
+        if (!Objects.equals(this.path, other.path)) {
+            return false;
+        }
+        return true;
     }
 
     public String getPath() {
         return path;
     }
 
-    public int getScore() {
-        return score;
-    }
-
-    public void setName(String name) {
-        this.name = name;
+    public float getWeight() {
+        return weight;
     }
 
     public void setPath(String path) {
         this.path = path;
     }
 
-    public void setScore(int score) {
-        this.score = score;
+    public void setWeight(float weight) {
+        this.weight = weight;
     }
 
 }

@@ -13,7 +13,7 @@ import java.util.List;
 
 public class DocumentLoader {
 
-    public static List<String> listf(String rootPath) {
+    public static List<String> loadList(String rootPath) {
         // simple but slow
         /*
          File directory = new File(directoryName);
@@ -23,7 +23,7 @@ public class DocumentLoader {
          resultList.addAll(Arrays.asList(fList));
          for (File file : fList) {
          if (!file.isFile()) {
-         resultList.addAll(listf(file.getAbsolutePath()));
+         resultList.addAll(loadList(file.getAbsolutePath()));
          }
          }
          return resultList;
