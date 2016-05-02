@@ -5,9 +5,9 @@ import java.util.Objects;
 public class Document implements Comparable<Document> {
 
     private String path;
-    private float weight;
+    private double weight;
 
-    public Document(String path, float weight) {
+    public Document(String path, double weight) {
         this.path = path;
         this.weight = weight;
     }
@@ -47,7 +47,7 @@ public class Document implements Comparable<Document> {
         return path;
     }
 
-    public float getWeight() {
+    public double getWeight() {
         return weight;
     }
 
@@ -55,8 +55,13 @@ public class Document implements Comparable<Document> {
         this.path = path;
     }
 
-    public void setWeight(float weight) {
+    public void setWeight(double weight) {
         this.weight = weight;
+    }
+
+    @Override
+    public String toString() {
+        return "Document{" + "path=" + path + ", weight=" + weight + '}';
     }
 
 }
