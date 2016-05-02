@@ -4,12 +4,14 @@ import com.porter.Stemmer;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.Serializable;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -17,13 +19,12 @@ import java.util.List;
 import java.util.Scanner;
 import javax.faces.bean.ApplicationScoped;
 import javax.faces.bean.ManagedBean;
-import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
 import javax.servlet.ServletContext;
 
-@ManagedBean(name = "terms", eager = true)
+@ManagedBean(name = "termContainer", eager = true)
 @ApplicationScoped
-public class TermContainer {
+public class TermContainer implements Serializable {
 
     public final String DATA_ROOT_PATH = "/travel_guides_txt";
     public final String STOP_WORDS_PATH = "/stop_words.txt";
@@ -63,12 +64,9 @@ public class TermContainer {
                 double freq = ((double) u) / tmp.size();
                 List<Document> documentList = terms.getOrDefault(term, new LinkedList<>());
                 documentList.add(new Document(path, freq));
+                terms.put(term, documentList);
             });
         });
-        // 3. iterate over all terms and convert frequency to weight
-        // w = tf * idf = tf * log2(n / df);
-        // tf = freq_term_in_the_doc / max_term_freq_in_all_docs;
-        // df = num_of_docs_containing_term;
         terms.forEach((String t, List<Document> documentList) -> {
             double maxFreq = 0f;
             for (Document d : documentList) {
@@ -83,14 +81,13 @@ public class TermContainer {
                 double weight = tf * idf;
                 d.setWeight(weight);
             }
+            documentList.sort((Document o1, Document o2) -> {
+                return o1.compareTo(o2);
+            });
         });
     }
 
     private void loadDocuments() {
-        //FacesContext context = FacesContext.getCurrentInstance();
-        //ExternalContext externalContext = context.getExternalContext();
-        //ServletContext sc = (ServletContext) externalContext.getContext();
-        //String s = sc.getRealPath(DATA_ROOT_PATH);
         String realPath = ((ServletContext) FacesContext.getCurrentInstance().getExternalContext().getContext()).getRealPath(DATA_ROOT_PATH);
         documents = new LinkedList<>();
         try {
@@ -128,7 +125,16 @@ public class TermContainer {
         return stopWords.contains(word);
     }
 
+    public HashMap<String, List<Document>> getTerms() {
+        return terms;
+    }
+
     public List<Document> getDocumentsByTerm(String term) {
         return terms.get(term);
     }
+
+    public List<Document> getDocumentsByTerm() {
+        return terms.get("Brief");
+    }
+
 }

@@ -18,19 +18,25 @@
 
             <h:selectBooleanCheckbox value="false" id ="lumberjack" />
             <h:outputLabel value="Lumberjack algorithm" />
+        </h:form>
 
-            <h:dataTable value="#{booleanModel.results}" var="document">
+        
+        
+        
+        
+        <h:dataTable value="#{booleanModel.results}" var="document">
+            <h:column>
+                <f:facet name="header">Path</f:facet>
+                <a href="#{document.path}" >#{document.path}</a>
+            </h:column>
+            <h:column>
+                <f:facet name="header">Score</f:facet>
+                    #{document.weight}
+            </h:column>
+        </h:dataTable>
 
-                <h:column>
-                    <f:facet name="header">Path</f:facet>
-                    <a href="#{document.path}" >#{document.path}</a>
-                </h:column>
-                <h:column>
-                    <f:facet name="header">Score</f:facet>
-                        #{document.weight}
-                </h:column>
-
-            </h:dataTable>
+        <h:form>
+            <h:commandButton action="terms_overview" value="Terms" />
         </h:form>
 
     </h:body>
