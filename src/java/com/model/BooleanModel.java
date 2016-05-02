@@ -1,21 +1,18 @@
 package com.model;
 
-import java.util.ArrayList;
+import java.io.Serializable;
+import java.util.LinkedList;
+import java.util.List;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.SessionScoped;
 
 @ManagedBean(name = "booleanModel", eager = true)
 @SessionScoped
-public class BooleanModel {
+public class BooleanModel implements Serializable{
 
     @ManagedProperty("#{termContainer}")
     private TermContainer termContainer;
-
-    //must povide the setter method
-    public void setTermContainer(TermContainer termContainer) {
-        this.termContainer = termContainer;
-    }
 
     private ExpressionEvaluator evaluator = new ExpressionEvaluator();
 
@@ -23,20 +20,18 @@ public class BooleanModel {
     private String expression = "";
 
     // to show results in html
-    private ArrayList<Document> results = new ArrayList<>();
+    private List<Document> results = new LinkedList<>();
 
     public void evaulate(boolean lumberjack) {
         results.clear();
-        results.add(new Document("link1", -1));
-        results.add(new Document("link2", -2));
     }
 
     // GETTERS AND SETTERS
-    public ArrayList<Document> getResults() {
+    public List<Document> getResults() {
         return results;
     }
 
-    public void setResults(ArrayList<Document> results) {
+    public void setResults(List<Document> results) {
         this.results = results;
     }
 
@@ -54,6 +49,11 @@ public class BooleanModel {
 
     public long getDuration() {
         return duration;
+    }
+    
+    // managedProperty == must povide the setter method
+    public void setTermContainer(TermContainer termContainer) {
+        this.termContainer = termContainer;
     }
 
 }

@@ -2,7 +2,8 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:h="http://xmlns.jcp.org/jsf/html"
-      xmlns:f="http://xmlns.jcp.org/jsf/core">
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
     <h:head>
         <title>Extended Boolean Model</title>
     </h:head>
@@ -13,21 +14,18 @@
             <h:outputLabel value="Enter expression: " />
             <h:inputText value="#{booleanModel.expression}" />       
 
-            <h:commandButton value="Search" type="submit" 
-                             action="#{booleanModel.evaulate(f1.lumberjack)}" />
+            <h:commandButton value="Search" type="submit" action="#{booleanModel.evaulate(f1.lumberjack)}" />
+
+            <h:commandButton value="Stop words" type="submit" action="/stop_words.txt" />
 
             <h:selectBooleanCheckbox value="false" id ="lumberjack" />
             <h:outputLabel value="Lumberjack algorithm" />
         </h:form>
 
-        
-        
-        
-        
         <h:dataTable value="#{booleanModel.results}" var="document">
             <h:column>
                 <f:facet name="header">Path</f:facet>
-                <a href="#{document.path}" >#{document.path}</a>
+                <a href="#{document.link}" >#{document.link}</a>
             </h:column>
             <h:column>
                 <f:facet name="header">Score</f:facet>
@@ -35,10 +33,12 @@
             </h:column>
         </h:dataTable>
 
-        <h:form>
-            <h:commandButton action="terms_overview" value="Terms" />
-        </h:form>
-
+        <dl>
+            <c:forEach items="#{booleanModel.results}" var="document">
+                <dt><a href="#{document.path}" >#{document.path}</a></dt>
+                <dd>#{document.weight}</dd>
+            </c:forEach>
+        </dl>
     </h:body>
 </html>
 

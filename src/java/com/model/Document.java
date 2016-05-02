@@ -37,10 +37,12 @@ public class Document implements Comparable<Document> {
             return false;
         }
         final Document other = (Document) obj;
-        if (!Objects.equals(this.path, other.path)) {
-            return false;
-        }
-        return true;
+        return Objects.equals(this.path, other.path);
+    }
+
+    @Override
+    public String toString() {
+        return "Document{" + "path=" + path + ", weight=" + weight + '}';
     }
 
     public String getPath() {
@@ -58,10 +60,10 @@ public class Document implements Comparable<Document> {
     public void setWeight(double weight) {
         this.weight = weight;
     }
-
-    @Override
-    public String toString() {
-        return "Document{" + "path=" + path + ", weight=" + weight + '}';
+    
+    public String getLink(){
+        String split[] = path.split("\\web");
+        return split[split.length-1];
     }
 
 }
