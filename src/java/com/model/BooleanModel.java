@@ -8,9 +8,15 @@ import javax.faces.bean.SessionScoped;
 @ManagedBean(name = "booleanModel", eager = true)
 @SessionScoped
 public class BooleanModel {
-    
-    @ManagedProperty("terms")
-    private TermContainer terms;
+
+    @ManagedProperty("#{termContainer}")
+    private TermContainer termContainer;
+
+    //must povide the setter method
+    public void setTermContainer(TermContainer termContainer) {
+        this.termContainer = termContainer;
+    }
+
     private ExpressionEvaluator evaluator = new ExpressionEvaluator();
 
     private long duration = 0;
@@ -49,6 +55,5 @@ public class BooleanModel {
     public long getDuration() {
         return duration;
     }
-
 
 }
