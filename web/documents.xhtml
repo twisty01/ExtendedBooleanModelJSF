@@ -13,10 +13,10 @@
         <h:outputText value="Number of documents: #{termLoader.getDocumentsByTerm(currentTerm.term).size()}" />
 
         <h:form>
-            <h:dataTable value="#{termLoader.getDocumentsByTerm(currentTerm.term)}" var="item">
+            <h:dataTable value="#{termLoader.getDocumentsByTerm(currentTerm.term)}" var="document">
                 <h:column>
                     <f:facet name="header">Link</f:facet>
-                    <h:commandLink action="#{document.link}" value="#{document.link}" />
+                    <h:link outcome="#{document.link}" value="#{document.link}" />
                 </h:column>
                 <h:column>
                     <f:facet name="header">Weight</f:facet>

@@ -12,14 +12,27 @@
     <h:body>
         <h:form>
             <div class="header">
-                <h1>List of Terms</h1>
-                <h:outputText class="cnt" value=" (total count #{termLoader.terms.size()})" />
+                <h1>List of Terms </h1>
+                <h:outputLabel class="cnt" value=" (total count: #{termLoader.terms.size()})" />
                 <h2>Bounding letters or terms</h2>
-                <label>Lower bound inclusive</label><h:inputText binding="#{from}" />
-                <label>Upper bound exclusive</label><h:inputText binding="#{to}"/>
-                <h:commandButton value="Show Terms" type="submit" action="#{listTerms.loadList(from.value,to.value)}"/>
+                <link href="resources/css/style.css" rel="stylesheet" type="text/css"/>
+                <table>
+                    <tr>
+                        <td><label for="fr">Lower bound (inclusive):</label></td>
+                        <td> <h:inputText id="fr" binding="#{from}" /></td>
+                    </tr>
+                    <tr>
+                        <td><label for="t">Upper bound (exclusive):</label></td>
+                        <td><h:inputText id="t" binding="#{to}"/></td>
+                    </tr>
+                    <tr>
+                        <td colspan="2">
+                            <h:commandLink value="Show Terms" type="submit" action="#{listTerms.loadList(from.value,to.value)}"/>
+                        </td>
+                    </tr>
+                </table>
             </div>
-            <div>
+            <div class="terms">
                 <ul>
                     <ui:repeat value="#{listTerms.list}" var="var">
                         <li>

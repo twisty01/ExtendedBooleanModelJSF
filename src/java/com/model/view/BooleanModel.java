@@ -25,7 +25,7 @@ public class BooleanModel implements Serializable {
     private long duration;
     private boolean simpleSearch = false;
     private String searchButton = "EBM Search", switchButton = "Switch to Simple Search";
-    private String resultsVisibility = "hidden";
+    private String resultsVisibility = "none";
     private List<Document> results;
     private int resPerPage = 50;
     private int currentPage = 1;
@@ -38,8 +38,11 @@ public class BooleanModel implements Serializable {
         expression = expression.toLowerCase();
         //evaluator = new ExpressionEvaluator(results,expression);
         //evaluator.evaluate();
+        results = termLoader.createResultsList();
+        reset();
         duration = System.nanoTime() - duration;
-        resultsVisibility = "visible";
+        duration/=1000;
+        resultsVisibility = "block";
     }
 
     public void setTermLoader(TermLoader termLoader) {
@@ -87,6 +90,7 @@ public class BooleanModel implements Serializable {
 
     public void setResPerPage(int resPerPage) {
         this.resPerPage = resPerPage;
+        reset();
     }
 
     public List<Document> getSubRes() {
@@ -111,6 +115,16 @@ public class BooleanModel implements Serializable {
             return;
         }
         currentPage--;
+        int lb = (currentPage - 1) * resPerPage;
+        int ub = lb + resPerPage;
+        subRes = results.subList(
+                lb > results.size() ? results.size() : lb,
+                ub > results.size() ? results.size() : ub
+        );
+    }
+
+    public void reset() {
+        currentPage = 1;
         int lb = (currentPage - 1) * resPerPage;
         int ub = lb + resPerPage;
         subRes = results.subList(

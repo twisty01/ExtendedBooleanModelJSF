@@ -4,13 +4,14 @@
 }
 .header *{
     margin: 0 auto;
+    font-size: 1em;
 }
 .header h1{
     font-size: 2.25em;
     margin-top: 1em;
     margin-bottom: 0.6em;
 }
-/* navigation */
+
 .nav ul {
     list-style-type: none;
     margin: 0;
@@ -19,7 +20,6 @@
 }
 .nav li {
     display: inline-block;
-    
 }
 .nav a {
     display: block;
@@ -29,28 +29,54 @@
     margin-top: 0.5em;
     background-color: #f9f9f9;
     border: 0.04em solid #eeeeee;
-    /*border-top: none;*/
 }
-/* search bar */
 .search *{
+    font-size: 1.3em;
     display: inline;
     text-decoration: none;
     padding: 0.5em 1em;
-    margin: 1em;
-    margin-top: 0.5em;
-    background-color: #cccccc;
+    margin: 0.8em 0.4em;
+    background-color: #f9f9f9;
+    border: 0.04em solid #cccccc;
+}
+.search a{
+    background-color: #eeeeee;
 }
 .header  a:hover {
     background-color: #4088ba;
 }
-
-/* results */
 .results h2{
-    font-size: 1.5em;
+    font-size: 1.85em;
     margin-top: 1em;
-    margin-bottom: 0.6em;
+    margin-bottom: 0.2em;
 }
-
 .results li{
     display: inline-block;
+}
+.results{
+    width: 60em;
+    margin: 0 auto;
+}
+table{
+    border: 0.04em solid #cccccc;
+    margin: 0 auto;
+    width: 100%;
+}
+table *{
+    background-color: #f9f9f9;
+    margin-top: 0.1em; 
+}
+table th{
+    background-color: #f9f9f9;
+    border-bottom: 0.04em solid #cccccc;
+}
+
+.pg * {
+    display: inline-block;
+    padding: 0.2em 0.7em;
+    text-decoration: none;
+    font-size: 1.3em;
+}
+.results div:first-of-type{
+    margin: 0 auto;
 }

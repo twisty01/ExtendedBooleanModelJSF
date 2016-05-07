@@ -156,6 +156,5 @@ public class TermLoader implements Serializable {
         }
         return results;
     }
-    
 
 }

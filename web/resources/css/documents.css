@@ -1,1 +1,24 @@
 
+table{
+    border: 0.04em solid #cccccc;
+    margin: 0 auto;
+    width: 60em;
+}
+
+table *{
+    background-color: #f9f9f9;
+    margin-top: 0.1em; 
+}
+
+table th{
+    background-color: #f9f9f9;
+    border-bottom: 0.04em solid #cccccc;
+}
+
+.pg * {
+    padding: 0.3em;
+}
+
+.results div:first-of-type{
+    margin: 0 auto;
+}

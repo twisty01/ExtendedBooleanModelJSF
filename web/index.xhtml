@@ -2,7 +2,8 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:h="http://xmlns.jcp.org/jsf/html"
-      xmlns:f="http://xmlns.jcp.org/jsf/core">
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://xmlns.jcp.org/jsf/passthrough">
     <h:head>
         <h:outputStylesheet library="css" name="style.css"  />
         <h:outputStylesheet library="css" name="main.css"  />
@@ -26,32 +27,42 @@
             </h:form>
         </div>
 
-        <div class="results" style="visibility: #{booleanModel.resultsVisibility}">
-
-            <h2>Results</h2>
+        <div class="results" style="display: #{booleanModel.resultsVisibility};pg">
             <h:form>
-                <h:outputText value="Duration: #{booleanModel.duration}" />
-                <ul>
-                    <li><h:commandLink value="&lt;&lt;" type="submit" action="" /></li>
-                    <h:inputText value="#{booleanModel.expression}" />
-                    <li><h:commandLink value="change" type="submit" action="" /></li>
-                    <li><h:commandLink value="&gt;&gt;" type="submit" action="" /></li>
-                </ul>
+                <h2>Results</h2>
+                <h:outputText value="Duration: #{booleanModel.duration} ms" />
+                <div>
+                    <h:outputLabel value="Results per Page: " for="sel" />
+                    <h:selectOneMenu id="sel" value="#{booleanModel.resPerPage}" onchange="submit();">
+                        <f:selectItem itemValue="50" itemLabel="50"/>
+                        <f:selectItem itemValue="100" itemLabel="100"/>
+                        <f:selectItem itemValue="200" itemLabel="200"/>
+                        <f:selectItem itemValue="500" itemLabel="500"/>
+                    </h:selectOneMenu>
+                </div>
+                <div class="pg">
+                    <h:commandLink value="&lt;&lt;" type="submit" action="#{booleanModel.prevPage()}" />
+                    <h:outputLabel value="#{booleanModel.resPerPage}" />
+                    <h:commandLink value="&gt;&gt;" type="submit" action="#{booleanModel.nextPage()}" />
+                </div>
 
-                <h:dataTable value="#{booleanModel.results}" var="document">
+                <h:dataTable value="#{booleanModel.subRes}" var="document">
                     <h:column>
                         <f:facet name="header">Link</f:facet>
-                        <h:commandLink action="#{document.link}" value="#{document.link}" />
+                        <h:link outcome="#{document.link}" value="#{document.link}" />
                     </h:column>
                     <h:column>
                         <f:facet name="header">Relevance</f:facet>
                         <h:outputText value="#{document.weight}" />
                     </h:column>
                 </h:dataTable>
+                <div class="pg">
+                    <h:commandLink value="&lt;&lt;" type="submit" action="#{booleanModel.prevPage()}" />
+                    <h:outputLabel value="#{booleanModel.resPerPage}" />
+                    <h:commandLink value="&gt;&gt;" type="submit" action="#{booleanModel.nextPage()}" />
+                </div>
             </h:form>
-
         </div>
-
     </h:body>
 </html>
 
