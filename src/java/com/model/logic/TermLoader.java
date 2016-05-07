@@ -1,4 +1,4 @@
-package com.model;
+package com.model.logic;
 
 import com.porter.Stemmer;
 import java.io.File;
@@ -11,21 +11,21 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.Scanner;
-import java.util.function.Consumer;
 import javax.faces.bean.ApplicationScoped;
 import javax.faces.bean.ManagedBean;
 import javax.faces.context.FacesContext;
 import javax.servlet.ServletContext;
 
-@ManagedBean(name = "termContainer", eager = true)
+@ManagedBean(name = "termLoader", eager = true)
 @ApplicationScoped
-public class TermContainer implements Serializable {
+public class TermLoader implements Serializable {
 
     public final String DATA_ROOT_PATH = "/travel_guides_txt";
     public final String STOP_WORDS_PATH = "/stop_words.txt";
@@ -33,8 +33,9 @@ public class TermContainer implements Serializable {
     private HashSet<String> stopWords;
     private List<String> documents;
     private HashMap<String, List<Document>> terms;
+    private List<String> listTerms;
 
-    public TermContainer() {
+    public TermLoader() {
         initialize();
     }
 
@@ -43,8 +44,7 @@ public class TermContainer implements Serializable {
         loadDocuments();
         // 1. iterate over all documents, load document to map of terms and number of occurencies;
         terms = new HashMap<>();
-        documents.stream().forEach((String path) -> {
-
+        for (String path : documents) {
             File file = new File(path);
             Scanner scn = null;
             try {
@@ -60,16 +60,15 @@ public class TermContainer implements Serializable {
                 }
             }
             scn.close();
-
             // 2. from occurencies to frequencies, add to map of terms and map of documents with frequencies
-            tmp.forEach((String term, Integer u) -> {
-                double freq = ((double) u) / tmp.size();
+            tmp.forEach((String term, Integer count) -> {
+                double freq = ((double) count) / tmp.size();
                 List<Document> documentList = terms.getOrDefault(term, new LinkedList<>());
                 documentList.add(new Document(path, freq));
                 terms.put(term, documentList);
             });
-        });
-        terms.forEach((String t, List<Document> documentList) -> {
+        }
+        for (List<Document> documentList : terms.values()) {
             double maxFreq = 0f;
             for (Document d : documentList) {
                 if (d.getWeight() > maxFreq) {
@@ -83,15 +82,8 @@ public class TermContainer implements Serializable {
                 double weight = tf * idf;
                 d.setWeight(weight);
             }
-            
-        });
-
-        System.out.println("Initialized..terms count=" + terms.size());
-        terms.entrySet().stream().forEach((entrySet) -> {
-            String key = entrySet.getKey();
-            List<Document> value = entrySet.getValue();
-            System.out.println(key.toUpperCase() + "  " + value);
-        });
+        }
+        initListTerms();
     }
 
     private void loadDocuments() {
@@ -127,6 +119,16 @@ public class TermContainer implements Serializable {
         }
     }
 
+    private void initListTerms() {
+        ArrayList<String> tmp = new ArrayList<>(terms.size());
+        for (String key : terms.keySet()) {
+            tmp.add(key);
+        }
+        Collections.sort(tmp);
+        listTerms = tmp;
+    }
+
+    // -------------------------------------------------------------------
     public boolean isStopWord(String word) {
         return stopWords.contains(word);
     }
@@ -138,9 +140,22 @@ public class TermContainer implements Serializable {
     public HashMap<String, List<Document>> getTerms() {
         return terms;
     }
-    
-    public List<Document> getDocumentsByTerm(String term){
+
+    public List<String> getListTerms() {
+        return listTerms;
+    }
+
+    public List<Document> getDocumentsByTerm(String term) {
         return terms.get(term);
     }
+    
+    public List<Document> createResultsList(){
+        LinkedList<Document> results = new LinkedList<>();
+        for ( String s : documents){
+            results.add(new Document(s,0));
+        }
+        return results;
+    }
+    
 
 }

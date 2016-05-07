@@ -1,27 +1,32 @@
-package com.model;
+package com.model.logic;
 
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
-import javax.faces.bean.ManagedProperty;
 
 
 public class ExpressionEvaluator  {
 
-    @ManagedProperty("#{termContainer}")
-    private TermContainer termContainer;
-    
-    //must povide the setter method
-    public void setTermContainer(TermContainer termContainer) {
-        this.termContainer = termContainer;
-    }
+    private String expression = "go and flower";        
+    private List<String> list;
     
     private HashMap<String, List<Document>> queryTerms;
     private List<String> myFinalDocuments; /*my documents potrebuju tam dostat vsechny dokumenty, 
                                            myslenka, na zacatku vsechny, postupne po prochazeni 
                                            dotazu -> vyhazuju nevyhovujici dokumenty*/
     
-    private final String expression = "go and flower";        
+    
+    public List getList( String expression ) {
+       String[] terms;
+       
+       terms = expression.split(" ");
+       
+        for (String term : terms) {
+            
+        }
+       
+       return list;
+    }
+    
     
     public void initializeTerms( String expression ) {
        queryTerms = new HashMap<>();
@@ -43,5 +48,7 @@ public class ExpressionEvaluator  {
         }
         return true;
     }
+    
+    
     
 }

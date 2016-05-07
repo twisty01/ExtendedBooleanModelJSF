@@ -1,19 +1,18 @@
-package com.model;
+package com.model.logic;
 
 import java.util.Objects;
 
 public class Document implements Comparable<Document> {
 
-    private String path;
+    private final String path;
+    private final String link;
     private double weight;
 
     public Document(String path, double weight) {
         this.path = path;
         this.weight = weight;
-    }
-
-    public Document() {
-        this("", 0);
+        String split[] = path.split("\\web");
+        link = split[split.length - 1].replace('\\', '/');
     }
 
     @Override
@@ -53,17 +52,12 @@ public class Document implements Comparable<Document> {
         return weight;
     }
 
-    public void setPath(String path) {
-        this.path = path;
-    }
-
     public void setWeight(double weight) {
         this.weight = weight;
     }
-    
-    public String getLink(){
-        String split[] = path.split("\\web");
-        return split[split.length-1];
-    }
 
+    public String getLink() {
+        return link;
+    }
+    
 }

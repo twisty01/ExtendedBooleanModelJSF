@@ -2,43 +2,56 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:h="http://xmlns.jcp.org/jsf/html"
-      xmlns:f="http://xmlns.jcp.org/jsf/core"
-      xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
     <h:head>
+        <h:outputStylesheet library="css" name="style.css"  />
+        <h:outputStylesheet library="css" name="main.css"  />
         <title>Extended Boolean Model</title>
     </h:head>
     <h:body>
-        <h1>Extended Boolean Model</h1>
+        <div class="header">
+            <h:form>
+                <div class="nav">
+                    <ul>
+                        <li><h:commandLink value="#{booleanModel.switchButton}" type="submit" action="#{booleanModel.switchSearch()}" /></li>
+                        <li><h:commandLink value="Stop words" type="submit" action="stop_words.txt" /></li>
+                        <li><h:commandLink value="Terms" type="submit" action="terms.xhtml" /></li>
+                    </ul>
+                </div> 
+                <h1>Extended Boolean Model</h1>
+                <div class="search">
+                    <h:inputText value="#{booleanModel.expression}" />
+                    <h:commandLink value="#{booleanModel.searchButton}" type="submit" action="#{booleanModel.evaulate()}" />
+                </div>
+            </h:form>
+        </div>
 
-        <h:form id ="f1">
-            <h:outputLabel value="Enter expression: " />
-            <h:inputText value="#{booleanModel.expression}" />       
+        <div class="results" style="visibility: #{booleanModel.resultsVisibility}">
 
-            <h:commandButton value="Search" type="submit" action="#{booleanModel.evaulate(f1.lumberjack)}" />
+            <h2>Results</h2>
+            <h:form>
+                <h:outputText value="Duration: #{booleanModel.duration}" />
+                <ul>
+                    <li><h:commandLink value="&lt;&lt;" type="submit" action="" /></li>
+                    <h:inputText value="#{booleanModel.expression}" />
+                    <li><h:commandLink value="change" type="submit" action="" /></li>
+                    <li><h:commandLink value="&gt;&gt;" type="submit" action="" /></li>
+                </ul>
 
-            <h:commandButton value="Stop words" type="submit" action="/stop_words.txt" />
+                <h:dataTable value="#{booleanModel.results}" var="document">
+                    <h:column>
+                        <f:facet name="header">Link</f:facet>
+                        <h:commandLink action="#{document.link}" value="#{document.link}" />
+                    </h:column>
+                    <h:column>
+                        <f:facet name="header">Relevance</f:facet>
+                        <h:outputText value="#{document.weight}" />
+                    </h:column>
+                </h:dataTable>
+            </h:form>
 
-            <h:selectBooleanCheckbox value="false" id ="lumberjack" />
-            <h:outputLabel value="Lumberjack algorithm" />
-        </h:form>
+        </div>
 
-        <h:dataTable value="#{booleanModel.results}" var="document">
-            <h:column>
-                <f:facet name="header">Path</f:facet>
-                <a href="#{document.link}" >#{document.link}</a>
-            </h:column>
-            <h:column>
-                <f:facet name="header">Score</f:facet>
-                    #{document.weight}
-            </h:column>
-        </h:dataTable>
-
-        <dl>
-            <c:forEach items="#{booleanModel.results}" var="document">
-                <dt><a href="#{document.path}" >#{document.path}</a></dt>
-                <dd>#{document.weight}</dd>
-            </c:forEach>
-        </dl>
     </h:body>
 </html>
 
