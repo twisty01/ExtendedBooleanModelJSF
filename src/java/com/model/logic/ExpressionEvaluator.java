@@ -9,7 +9,7 @@ public class ExpressionEvaluator  {
     private String expression = "go and flower";        
     private List<String> list;
     
-    private HashMap<String, List<Document>> queryTerms;
+    private HashMap<String, List<DocResult>> queryTerms;
     private List<String> myFinalDocuments; /*my documents potrebuju tam dostat vsechny dokumenty, 
                                            myslenka, na zacatku vsechny, postupne po prochazeni 
                                            dotazu -> vyhazuju nevyhovujici dokumenty*/

@@ -1,13 +1,10 @@
 package com.model.view;
 
-import com.model.logic.Document;
-import com.model.logic.ExpressionEvaluator;
+import com.model.logic.DocResult;
+import com.model.logic.Evaluator;
 import com.model.logic.TermLoader;
 import java.io.Serializable;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.SessionScoped;
@@ -19,29 +16,30 @@ public class BooleanModel implements Serializable {
     @ManagedProperty("#{termLoader}")
     private TermLoader termLoader;
 
-    private ExpressionEvaluator evaluator;
+    private Evaluator evaluator;
 
     private String expression = "";
     private long duration;
     private boolean simpleSearch = false;
     private String searchButton = "EBM Search", switchButton = "Switch to Simple Search";
     private String resultsVisibility = "none";
-    private List<Document> results;
+    private List<DocResult> results;
     private int resPerPage = 50;
     private int currentPage = 1;
-    private List<Document> subRes;
+    private List<DocResult> subRes;
 
     /* include magic here */
     public void evaulate() {
-        results = termLoader.createResultsList();
         duration = System.nanoTime();
-        expression = expression.toLowerCase();
-        //evaluator = new ExpressionEvaluator(results,expression);
-        //evaluator.evaluate();
-        results = termLoader.createResultsList();
-        reset();
+        if (!simpleSearch) {
+            evaluator = termLoader.createEval();
+            evaluator.evaluate(expression);
+            results = evaluator.getResults();
+        }
         duration = System.nanoTime() - duration;
-        duration/=1000;
+        duration /= 1000;
+        // show results
+        reset();
         resultsVisibility = "block";
     }
 
@@ -93,7 +91,7 @@ public class BooleanModel implements Serializable {
         reset();
     }
 
-    public List<Document> getSubRes() {
+    public List<DocResult> getSubRes() {
         return subRes;
     }
 

@@ -22,6 +22,7 @@ import javax.faces.bean.ApplicationScoped;
 import javax.faces.bean.ManagedBean;
 import javax.faces.context.FacesContext;
 import javax.servlet.ServletContext;
+import jdk.internal.util.xml.impl.Pair;
 
 @ManagedBean(name = "termLoader", eager = true)
 @ApplicationScoped
@@ -32,7 +33,9 @@ public class TermLoader implements Serializable {
 
     private HashSet<String> stopWords;
     private List<String> documents;
-    private HashMap<String, List<Document>> terms;
+    private HashMap<String, List<DocTermValue>> terms;
+
+    // for html
     private List<String> listTerms;
 
     public TermLoader() {
@@ -44,16 +47,18 @@ public class TermLoader implements Serializable {
         loadDocuments();
         // 1. iterate over all documents, load document to map of terms and number of occurencies;
         terms = new HashMap<>();
-        for (String path : documents) {
+        for (int i = 0; i < documents.size(); i++) {
+            final int idx = i;
+            String path = documents.get(i);
             File file = new File(path);
             Scanner scn = null;
             try {
-                scn = new Scanner(file).useDelimiter("[^a-zA-Z]+| <.*>");
+                scn = new Scanner(file).useDelimiter("[^a-zA-Z]+");
             } catch (FileNotFoundException ex) {
             }
             HashMap<String, Integer> tmp = new HashMap<>();
             while (scn.hasNext()) {
-                String word = scn.next().toLowerCase();
+                String word = scn.next().trim().toLowerCase();
                 if (isTerm(word)) {
                     String term = Stemmer.stem(word);
                     tmp.put(term, tmp.getOrDefault(term, 0) + 1);
@@ -63,19 +68,20 @@ public class TermLoader implements Serializable {
             // 2. from occurencies to frequencies, add to map of terms and map of documents with frequencies
             tmp.forEach((String term, Integer count) -> {
                 double freq = ((double) count) / tmp.size();
-                List<Document> documentList = terms.getOrDefault(term, new LinkedList<>());
-                documentList.add(new Document(path, freq));
+                List<DocTermValue> documentList = terms.getOrDefault(term, new LinkedList<>());
+                documentList.add(new DocTermValue(idx, freq));
                 terms.put(term, documentList);
             });
         }
-        for (List<Document> documentList : terms.values()) {
+        // 3. compute weight
+        for (List<DocTermValue> documentList : terms.values()) {
             double maxFreq = 0f;
-            for (Document d : documentList) {
+            for (DocTermValue d : documentList) {
                 if (d.getWeight() > maxFreq) {
                     maxFreq = d.getWeight();
                 }
             }
-            for (Document d : documentList) {
+            for (DocTermValue d : documentList) {
                 double freq = d.getWeight(); // temp. frekvence ulozena do vahy
                 double tf = freq / maxFreq;
                 double idf = Math.log(((double) documents.size()) / documentList.size());   // vadi prirozeny misto dvojkoveho?
@@ -93,16 +99,17 @@ public class TermLoader implements Serializable {
             Files.walkFileTree(Paths.get(realPath), new SimpleFileVisitor<Path>() {
                 @Override
                 public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
-
                     File f = file.toFile();
                     if (f.isFile()) {
-                        documents.add(f.getPath());
+                        String path = f.getPath();
+                        documents.add(path);
                     }
                     return FileVisitResult.CONTINUE;
                 }
             });
         } catch (IOException ex) {
         }
+        Collections.sort(documents);
     }
 
     private void loadStopWords() {
@@ -137,7 +144,7 @@ public class TermLoader implements Serializable {
         return !isStopWord(word) && word.length() > 1;
     }
 
-    public HashMap<String, List<Document>> getTerms() {
+    public HashMap<String, List<DocTermValue>> getTerms() {
         return terms;
     }
 
@@ -145,16 +152,32 @@ public class TermLoader implements Serializable {
         return listTerms;
     }
 
-    public List<Document> getDocumentsByTerm(String term) {
-        return terms.get(term);
-    }
-    
-    public List<Document> createResultsList(){
-        LinkedList<Document> results = new LinkedList<>();
-        for ( String s : documents){
-            results.add(new Document(s,0));
+    public List<DocResult> getDocumentsByTerm(String term) {
+        List<DocTermValue> val = terms.get(term);
+        List<DocResult> res = new ArrayList<>(val.size());
+        for ( DocTermValue d : val){
+            String path = documents.get(d.getIdx());
+            res.add(new DocResult(DocResult.pathToLink(path), d.getWeight()));
         }
-        return results;
+        return res;
     }
 
+    public Evaluator createEval() {
+        HashMap<String, List<DocTermValue>> newTerms = new HashMap<>();
+        List<DocResult> results = new ArrayList<>(documents.size());
+        terms.forEach((String t, List<DocTermValue> u) -> {
+            List<DocTermValue> tempDocs = new LinkedList<>();
+            for (DocTermValue d : u) {
+                tempDocs.add(new DocTermValue(d.getIdx(), 0));
+            }
+            newTerms.put(t, tempDocs);
+        });
+
+        for (String path : documents) {
+            results.add(new DocResult(DocResult.pathToLink(path), 0));
+        }
+
+        return new Evaluator(newTerms, results);
+    }
+    
 }

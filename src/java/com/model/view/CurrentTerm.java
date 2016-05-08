@@ -1,6 +1,6 @@
 package com.model.view;
 
-import com.model.logic.Document;
+import com.model.logic.DocResult;
 import com.model.logic.TermLoader;
 import java.io.Serializable;
 import java.util.List;
@@ -17,7 +17,7 @@ public class CurrentTerm implements Serializable{
     
     private String term = "";
     
-    private List<Document> documentsByTerm;
+    private List<DocResult> documentsByTerm;
 
     public void setTerm(String term) {
         this.term = term;
@@ -36,7 +36,7 @@ public class CurrentTerm implements Serializable{
         return term;
     }
 
-    public List<Document> getDocumentsByTerm() {
+    public List<DocResult> getDocumentsByTerm() {
         return documentsByTerm;
     }
     
