@@ -4,7 +4,7 @@ public class DocResult implements Comparable<DocResult> {
 
     private final String link;
     
-    public Expression expression;
+    public Node expression;
     private double relevance;
 
     public DocResult(String link, double relevance) {
