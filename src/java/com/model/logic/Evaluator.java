@@ -132,36 +132,10 @@ public class Evaluator {
         // every doc evaluate recursively
         results = termLoader.createResults();
         
-        // iterate over expression, create nested expression for each document, untill reaching the endNodes= terms
-       
+    
         
     }
 
-    private int recEvaluate(List<String> atoms, int i) {
-        boolean isAnd = false, decided = false;
-
-        while (i < atoms.size()) {
-            String curAtom = atoms.get(i);
-            if ("(".equals(curAtom)) {
-                i = recEvaluate(atoms, i + 1);
-            } else if ("&&".equals(curAtom)) {
-            } else if ("||".equals(curAtom)) {
-            } else {
-                if (!decided) {
-                    String tmp = atoms.get(i + 1);
-                    if (tmp.equals(AND)) {
-                        isAnd = true;
-                    } else if (tmp.equals(OR)) {
-                        isAnd = false;
-                    }
-                    decided = true;
-                }
-                // todo?
-            }
-        }
-
-        return 0;
-    }
 
     public void setTermLoader(TermLoader termLoader) {
         this.termLoader = termLoader;
