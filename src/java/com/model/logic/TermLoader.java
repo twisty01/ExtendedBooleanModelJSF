@@ -33,6 +33,7 @@ public class TermLoader implements Serializable {
 
     private HashSet<String> stopWords;
     private List<String> documents;
+
     private HashMap<String, List<DocTermValue>> terms;
 
     // for html
@@ -88,6 +89,7 @@ public class TermLoader implements Serializable {
                 double weight = tf * idf;
                 d.setWeight(weight);
             }
+            Collections.sort(documentList);
         }
         initListTerms();
     }
@@ -152,32 +154,26 @@ public class TermLoader implements Serializable {
         return listTerms;
     }
 
+    public List<String> getDocuments() {
+        return documents;
+    }
+
     public List<DocResult> getDocumentsByTerm(String term) {
         List<DocTermValue> val = terms.get(term);
         List<DocResult> res = new ArrayList<>(val.size());
-        for ( DocTermValue d : val){
+        for (DocTermValue d : val) {
             String path = documents.get(d.getIdx());
             res.add(new DocResult(DocResult.pathToLink(path), d.getWeight()));
         }
         return res;
     }
 
-    public Evaluator createEval() {
-        HashMap<String, List<DocTermValue>> newTerms = new HashMap<>();
+    public List<DocResult> createResults() {
         List<DocResult> results = new ArrayList<>(documents.size());
-        terms.forEach((String t, List<DocTermValue> u) -> {
-            List<DocTermValue> tempDocs = new LinkedList<>();
-            for (DocTermValue d : u) {
-                tempDocs.add(new DocTermValue(d.getIdx(), 0));
-            }
-            newTerms.put(t, tempDocs);
-        });
-
         for (String path : documents) {
             results.add(new DocResult(DocResult.pathToLink(path), 0));
         }
-
-        return new Evaluator(newTerms, results);
+        return results;
     }
-    
+
 }

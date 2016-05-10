@@ -16,8 +16,6 @@ public class BooleanModel implements Serializable {
     @ManagedProperty("#{termLoader}")
     private TermLoader termLoader;
 
-    private Evaluator evaluator;
-
     private String expression = "";
     private long duration;
     private boolean simpleSearch = false;
@@ -30,21 +28,22 @@ public class BooleanModel implements Serializable {
 
     /* include magic here */
     public void evaulate() {
+
         duration = System.nanoTime();
         if (!simpleSearch) {
-            evaluator = termLoader.createEval();
-            evaluator.evaluate(expression);
+            Evaluator evaluator = new Evaluator();
+            evaluator.setTermLoader(termLoader);
+            evaluator.parse(expression);
+            evaluator.evaluate();
             results = evaluator.getResults();
+        } else {
+            // todo 
         }
         duration = System.nanoTime() - duration;
         duration /= 1000;
         // show results
         reset();
         resultsVisibility = "block";
-    }
-
-    public void setTermLoader(TermLoader termLoader) {
-        this.termLoader = termLoader;
     }
 
     public String getExpression() {
@@ -129,6 +128,10 @@ public class BooleanModel implements Serializable {
                 lb > results.size() ? results.size() : lb,
                 ub > results.size() ? results.size() : ub
         );
+    }
+
+    public void setTermLoader(TermLoader termLoader) {
+        this.termLoader = termLoader;
     }
 
 }

@@ -1,8 +1,10 @@
 package com.model.logic;
 
-public class DocResult {
+public class DocResult implements Comparable<DocResult> {
 
     private final String link;
+    
+    public Expression expression;
     private double relevance;
 
     public DocResult(String link, double relevance) {
@@ -31,6 +33,17 @@ public class DocResult {
         String split[] = path.split("\\web");
         String link = split[split.length - 1].replace('\\', '/');
         return link;
+    }
+
+    @Override
+    public int compareTo(DocResult o) {
+        if (relevance - o.getRelevance() > 0) {
+            return 1;
+        } else if (relevance - o.getRelevance() < 0) {
+            return -1;
+        } else {
+            return 0;
+        }
     }
 
 }

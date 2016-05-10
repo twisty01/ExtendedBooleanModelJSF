@@ -2,7 +2,7 @@
 
  /** * * @author Adam */
 
-public class DocTermValue { 
+public class DocTermValue implements Comparable<DocTermValue>{ 
 
     private final int idx;
     private double weight = 0;
@@ -22,6 +22,11 @@ public class DocTermValue {
 
     public void setWeight(double weight) {
         this.weight = weight;
+    }
+
+    @Override
+    public int compareTo(DocTermValue o) {
+        return idx - o.idx;
     }
     
 }
