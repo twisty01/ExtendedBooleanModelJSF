@@ -20,12 +20,12 @@ public class Evaluator {
     public static String OR = "||";
     public static String OP_PAR = "(";
     public static String CL_PAR = ")";
-    public static Set<String> OPs = new HashSet<>(Arrays.asList(AND, OR, OP_PAR, CL_PAR)); // not NOT on purpose
+    public static Set<String> OPs = new HashSet<>(Arrays.asList(AND, OR, OP_PAR, CL_PAR, NOT)); // not NOT on purpose
 
-    private LinkedList<String> atoms;
-
-    private TermLoader termLoader;
-    private List<DocResult> results;
+    public LinkedList<String> atoms;
+    public List<DocResult> results;
+    
+    public TermLoader termLoader;
 
     public boolean parse(String expression) {
         atoms = new LinkedList<>(Arrays.asList(expression
@@ -139,6 +139,7 @@ public class Evaluator {
             last = cur;
         }
     }
+
 
     public void evaluate() {
         // todo evalute
