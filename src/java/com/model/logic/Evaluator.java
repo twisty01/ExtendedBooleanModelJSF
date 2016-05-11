@@ -4,12 +4,12 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Set;
 import java.util.regex.Pattern;
 
 public class Evaluator {
 
-    // not? 
     public static String notQ = Pattern.quote("!");
     public static String andQ = Pattern.quote("&&");
     public static String orQ = Pattern.quote("||");
@@ -22,7 +22,7 @@ public class Evaluator {
     public static String CL_PAR = ")";
     public static Set<String> OPs = new HashSet<>(Arrays.asList(AND, OR, OP_PAR, CL_PAR)); // not NOT on purpose
 
-    private List<String> atoms;
+    private LinkedList<String> atoms;
 
     private TermLoader termLoader;
     private List<DocResult> results;
@@ -39,91 +39,99 @@ public class Evaluator {
                 .trim()
                 .split(" ")));
 
-        if (!isValid(atoms)) {
+        if (!checkPars()) {
             return false;
         }
 
-        addANDs(atoms);
+        addANDs();
 
-        String lastAtom = "";
-        int i = 0;
-        while (i < atoms.size()) {
-            String curAtom = atoms.get(i);
-            if (OPs.contains(curAtom)) {
-                if (lastAtom.equals(OR) && curAtom.equals(AND)) {
-                    if (atoms.get(i - 2).equals(NOT)) {
-                        atoms.add(i - 2, OP_PAR);
-                    } else {
-                        atoms.add(i - 1, OP_PAR);
-                    }
-                    i = recBracketing(atoms, i + 1);
-                } else if (lastAtom.equals("") && curAtom.equals(AND)) {
-                    atoms.add(0, OP_PAR);
-                    i = recBracketing(atoms, i + 1);
-                }
-
-                lastAtom = curAtom;
-            }
-            i++;
-        }
+        recAddPars(atoms.listIterator(), false);
 
         return true;
     }
 
-    private int recBracketing(List<String> list, int i) {
+    private ListIterator<String> recAddPars(ListIterator<String> l, boolean addedPar) {
+        int i = l.nextIndex();
         String lastAtom = "";
-        while (i < list.size()) {
-            String curAtom = list.get(i);
-            if (OPs.contains(curAtom)) {
-                if (lastAtom.equals(OR) && curAtom.equals(AND)) {
-                    if (atoms.get(i - 2).equals(NOT)) {
-                        list.add(i - 2, OP_PAR);
-                    } else {
-                        list.add(i - 1, OP_PAR);
-                    }
-                    i = recBracketing(list, i + 1);
-                } else if (lastAtom.equals(AND) && curAtom.equals(OR)) {
-                    list.add(i, CL_PAR);
-                    return i;
-                }
-                if (curAtom.equals(CL_PAR)) {
-                    list.add(i, CL_PAR);
-                    return i;
-                }
-                lastAtom = curAtom;
+        while (l.hasNext()) {
+            String curAtom = l.next();
+            if (!OPs.contains(curAtom) || curAtom.equals(NOT)) {
+                continue;
             }
-            i++;
+            if (lastAtom.equals(OR) && curAtom.equals(AND)) {
+                while (l.previous().equals(OR)) {
+                }
+                l.previous();
+                l.add(OP_PAR);
+                l.next();
+                l = recAddPars(l, true);
+            } else if (lastAtom.equals(AND) && curAtom.equals(OR)) {
+                l.previous();
+                l.add(CL_PAR);
+                if (!addedPar) {
+                    int tmp = l.nextIndex();
+                    atoms.add(i, OP_PAR);
+                    l = atoms.listIterator(tmp + 1);
+                }
+            } else if (curAtom.equals(OP_PAR)) {
+                l = recAddPars(l, false);
+            } else if (curAtom.equals(CL_PAR)) {
+                if (addedPar) {
+                    l.add(CL_PAR);
+                }
+                return l;
+            }
+            lastAtom = curAtom;
         }
-        return i;
+        return l;
     }
 
-    private boolean isValid(List<String> list) {
+    private ListIterator<String> recConvertToANDs(ListIterator<String> l) {
+        return l;
+    }
+
+    public void removeDoubleNegations() {
+        String lastAtom = "";
+        ListIterator<String> l = atoms.listIterator();
+        while (l.hasNext()) {
+            String curAtom = l.next();
+            if (lastAtom.equals(NOT) && curAtom.equals(NOT)) {
+                l.previous();
+                l.remove();
+            }
+            lastAtom = curAtom;
+        }
+    }
+
+    private boolean checkPars() {
         int valid = 0;
-        for (String s : list) {
-            if (s.equals(OP_PAR)) {
+        for (String curAtom : atoms) {
+            if (curAtom.equals(OP_PAR)) {
                 valid++;
-            } else if (s.equals(CL_PAR)) {
+            } else if (curAtom.equals(CL_PAR)) {
                 valid--;
             }
             if (valid < 0) {
                 return false;
             }
         }
-
         return true;
     }
 
-    private void addANDs(List<String> list) {
+    private boolean checkOPs(ListIterator<String> l) {
+        return true;
+    }
+
+    private void addANDs() {
         String last = AND;
-        int i = 0;
-        while (i < list.size()) {
-            String cur = list.get(i);
-            if (!OPs.contains(last) && !OPs.contains(cur) && !last.equals(NOT)) {
-                list.add(i, AND);
-                i++;
+        ListIterator<String> l = atoms.listIterator();
+        while (l.hasNext()) {
+            String cur = l.next();
+            if (!OPs.contains(last) && (!OPs.contains(cur) || cur.equals(NOT))) {
+                l.previous();
+                l.add(AND);
             }
             last = cur;
-            i++;
         }
     }
 
@@ -131,11 +139,8 @@ public class Evaluator {
         // todo evalute
         // every doc evaluate recursively
         results = termLoader.createResults();
-        
-    
-        
-    }
 
+    }
 
     public void setTermLoader(TermLoader termLoader) {
         this.termLoader = termLoader;
