@@ -55,33 +55,37 @@ public class Evaluator {
         String lastAtom = "";
         while (l.hasNext()) {
             String curAtom = l.next();
-            if (!OPs.contains(curAtom) || curAtom.equals(NOT)) {
-                continue;
-            }
-            if (lastAtom.equals(OR) && curAtom.equals(AND)) {
-                while (l.previous().equals(OR)) {
+            if (OPs.contains(curAtom) && !curAtom.equals(NOT)) {
+
+                if (lastAtom.equals(OR) && curAtom.equals(AND)) {
+                    while (l.previous().equals(OR)) {
+                    }
+                    l.previous();
+                    l.add(OP_PAR);
+                    l.next();
+                    l = recAddPars(l, true);
+                } else if (lastAtom.equals(AND) && curAtom.equals(OR)) {
+                    l.previous();
+                    l.add(CL_PAR);
+                    if (!addedPar) {
+                        int tmp = l.nextIndex();
+                        atoms.add(i, OP_PAR);
+                        l = atoms.listIterator(tmp + 1);
+                    }
+                } else if (curAtom.equals(OP_PAR)) {
+                    l = recAddPars(l, false);
+                } else if (curAtom.equals(CL_PAR)) {
+                    if (addedPar) {
+                        l.add(CL_PAR);
+                    }
+                    return l;
                 }
-                l.previous();
-                l.add(OP_PAR);
-                l.next();
-                l = recAddPars(l, true);
-            } else if (lastAtom.equals(AND) && curAtom.equals(OR)) {
-                l.previous();
-                l.add(CL_PAR);
-                if (!addedPar) {
-                    int tmp = l.nextIndex();
-                    atoms.add(i, OP_PAR);
-                    l = atoms.listIterator(tmp + 1);
-                }
-            } else if (curAtom.equals(OP_PAR)) {
-                l = recAddPars(l, false);
-            } else if (curAtom.equals(CL_PAR)) {
+                lastAtom = curAtom;
+            } else if (!l.hasNext()) {
                 if (addedPar) {
                     l.add(CL_PAR);
                 }
-                return l;
             }
-            lastAtom = curAtom;
         }
         return l;
     }
@@ -130,6 +134,7 @@ public class Evaluator {
             if (!OPs.contains(last) && (!OPs.contains(cur) || cur.equals(NOT))) {
                 l.previous();
                 l.add(AND);
+                l.next();
             }
             last = cur;
         }
