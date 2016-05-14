@@ -33,8 +33,7 @@ public class BooleanModel implements Serializable {
         if (!simpleSearch) {
             Evaluator evaluator = new Evaluator();
             evaluator.setTermLoader(termLoader);
-            evaluator.parse(expression);
-            evaluator.evaluate();
+            evaluator.evaluate(expression);
             results = evaluator.getResults();
         } else {
             // todo 

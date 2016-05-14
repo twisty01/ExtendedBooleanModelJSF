@@ -25,7 +25,7 @@ public class CurrentTerm implements Serializable{
     }
     
     public void fill(){
-        documentsByTerm = termLoader.getDocumentsByTerm(term);
+        documentsByTerm = termLoader.getDocResByTerm(term);
     }
     
     public void setTermLoader(TermLoader termLoader) {

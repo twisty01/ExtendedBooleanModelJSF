@@ -1,6 +1,9 @@
 package com.model.logic;
 
+import static java.lang.Math.sqrt;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -24,10 +27,10 @@ public class Evaluator {
 
     public LinkedList<String> atoms;
     public List<DocResult> results;
-    
-    public TermLoader termLoader;
 
-    public boolean parse(String expression) {
+    private TermLoader termLoader;
+
+    private boolean parse(String expression) {
         atoms = new LinkedList<>(Arrays.asList(expression
                 .toLowerCase()
                 .replaceAll(andQ, " && ")
@@ -38,15 +41,16 @@ public class Evaluator {
                 .replaceAll("  +", " ")
                 .trim()
                 .split(" ")));
-
         if (!checkPars()) {
             return false;
         }
-
         addANDs();
-
+        //if (!checkOPs(atoms.listIterator())) {
+        //    return false;
+        //}
         recAddPars(atoms.listIterator(), false);
-
+        //recConvertToANDs(atoms.listIterator());
+        removeDoubleNegations();
         return true;
     }
 
@@ -56,7 +60,6 @@ public class Evaluator {
         while (l.hasNext()) {
             String curAtom = l.next();
             if (OPs.contains(curAtom) && !curAtom.equals(NOT)) {
-
                 if (lastAtom.equals(OR) && curAtom.equals(AND)) {
                     while (l.previous().equals(OR)) {
                     }
@@ -90,11 +93,7 @@ public class Evaluator {
         return l;
     }
 
-    private ListIterator<String> recConvertToANDs(ListIterator<String> l) {
-        return l;
-    }
-
-    public void removeDoubleNegations() {
+    private void removeDoubleNegations() {
         String lastAtom = "";
         ListIterator<String> l = atoms.listIterator();
         while (l.hasNext()) {
@@ -122,6 +121,10 @@ public class Evaluator {
         return true;
     }
 
+    private ListIterator<String> recConvertToANDs(ListIterator<String> l) {
+        return l;
+    }
+
     private boolean checkOPs(ListIterator<String> l) {
         return true;
     }
@@ -140,12 +143,102 @@ public class Evaluator {
         }
     }
 
+    private double recEvaluate(int idx, ListIterator<String> l) {
+        boolean conjunction = true;
+        boolean nextIsNegation = false;
+        double value = 0;
+        int t = 0;
+        while (l.hasNext()) {
+            String curAtom = l.next();
+            t++;
+            if (curAtom.equals(OR)) {
+                conjunction = false;
+                break;
+            } else if (curAtom.equals(AND)) {
+                conjunction = true;
+                break;
+            }
+        }
+        for (int i = 0; i < t; i++) {
+            l.previous();
+        }
+        t = 0;
+        while (l.hasNext()) {
+            String curAtom = l.next();
+            if (!OPs.contains(curAtom)) {
+                double tmp = getWeight(idx, curAtom);
+                t++;
+                if ((conjunction && nextIsNegation) || (!conjunction && !nextIsNegation)) {
+                    value += tmp * tmp;
+                } else {
+                    value += (1 - tmp) * (1 - tmp);
+                }
+            } else {
+                if (curAtom.equals(NOT)) {
+                    nextIsNegation = !nextIsNegation;
+                } else if (curAtom.equals(OP_PAR)) {
+                    double tmp = recEvaluate(idx, l);
+                    t++;
+                    if ((conjunction && nextIsNegation) || (!conjunction && !nextIsNegation)) {
+                        value += tmp * tmp;
+                    } else {
+                        value += (1 - tmp) * (1 - tmp);
+                    }
+                } else if (curAtom.equals(CL_PAR)) {
+                    break;
+                } else if (curAtom.equals(AND) || curAtom.equals(OR)) {
+                    nextIsNegation = false;
+                }
+            }
+        }
+        value /= t;
+        value = sqrt(value);
+        if (conjunction) {
+            value = 1 - value;
+        }
+        return value;
+    }
 
-    public void evaluate() {
+    private double getWeight(int idx, String term) {
+        List<DocTermValue> list = termLoader.getDocValueByTerm(term);
+        /*
+         int i = Collections.binarySearch(list, new DocTermValue(idx, 0));
+         if (i < 0) {
+         return 0;
+         }
+         DocTermValue tmp = list.get(i);
+         return tmp.getWeight();
+         */
+        for (DocTermValue v : list) {
+            if (v.getIdx() == idx) {
+                return v.getWeight();
+            }
+        }
+        return 0;
+    }
+
+    /// --------------------------------------
+    public boolean evaluate(String expression) {
+        if (!parse(expression)) {
+            return false;
+        }
         // todo evalute
         // every doc evaluate recursively
         results = termLoader.createResults();
-
+        for (int i = 0; i < results.size(); i++) {
+            DocResult r = results.get(i);
+            r.setRelevance(recEvaluate(i, atoms.listIterator()));
+        }
+        results.sort((DocResult o1, DocResult o2) -> {
+            if (o1.getRelevance() - o2.getRelevance() < 0) {
+                return 1;
+            } else if (o1.getRelevance() - o2.getRelevance() > 0) {
+                return -1;
+            } else {
+                return 0;
+            }
+        });
+        return true;
     }
 
     public void setTermLoader(TermLoader termLoader) {

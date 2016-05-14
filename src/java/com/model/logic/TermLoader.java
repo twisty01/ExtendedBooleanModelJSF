@@ -158,7 +158,7 @@ public class TermLoader implements Serializable {
         return documents;
     }
 
-    public List<DocResult> getDocumentsByTerm(String term) {
+    public List<DocResult> getDocResByTerm(String term) {
         List<DocTermValue> val = terms.get(term);
         List<DocResult> res = new ArrayList<>(val.size());
         for (DocTermValue d : val) {
@@ -166,6 +166,10 @@ public class TermLoader implements Serializable {
             res.add(new DocResult(DocResult.pathToLink(path), d.getWeight()));
         }
         return res;
+    }
+    
+    public List<DocTermValue> getDocValueByTerm(String term){
+        return terms.get(term);
     }
 
     public List<DocResult> createResults() {
