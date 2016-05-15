@@ -73,9 +73,9 @@ public class TermLoader implements Serializable {
             final double wc = wordCount;
             // 2. from occurencies to frequencies, add to map of terms and map of documents with frequencies
             tmp.forEach((String term, Integer count) -> {
-                //double freq = ((double) count) / tmp.size();
+                double freq = count / wc;
                 List<DocTermValue> documentList = terms.getOrDefault(term, new LinkedList<>());
-                documentList.add(new DocTermValue(idx, /*freq*/ count /wc));
+                documentList.add(new DocTermValue(idx, freq));
                 terms.put(term, documentList);
             });
         }
@@ -84,14 +84,14 @@ public class TermLoader implements Serializable {
             double df = documentList.size();
             double idf = Math.log(documents.size() / df);   // vadi prirozeny misto dvojkoveho?
             double maxFreq = 0f;
-            for (DocTermValue d : documentList) {
+            /*for (DocTermValue d : documentList) {
                 if (d.getWeight()> maxFreq) {
                     maxFreq = d.getWeight();
                 }
-            }
+            }*/
             for (DocTermValue d : documentList) {
                 double freq = d.getWeight(); // temp. frekvence ulozena do vahy
-                double tf = freq / maxFreq;
+                double tf = freq /* / maxFreq*/;
                 double weight = tf * idf;
                 d.setWeight(weight);
             }
