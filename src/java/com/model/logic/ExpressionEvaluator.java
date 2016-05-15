@@ -1,5 +1,6 @@
 package com.model.logic;
 
+import com.model.view.DocResult;
 import java.util.HashMap;
 import java.util.List;
 

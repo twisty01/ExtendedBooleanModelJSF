@@ -1,6 +1,5 @@
 package com.model.view;
 
-import com.model.logic.DocResult;
 import com.model.logic.TermLoader;
 import java.io.Serializable;
 import java.util.List;
@@ -25,7 +24,7 @@ public class CurrentTerm implements Serializable{
     }
     
     public void fill(){
-        documentsByTerm = termLoader.getDocResByTerm(term);
+        documentsByTerm = termLoader.getDocumentsByTerm(term);
     }
     
     public void setTermLoader(TermLoader termLoader) {

@@ -2,9 +2,6 @@ package com.model.logic;
 
 import java.util.List;
 
-/**
- * * * @author Adam
- */
 public class Node {
 
     public Node parent;

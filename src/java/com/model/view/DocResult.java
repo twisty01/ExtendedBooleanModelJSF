@@ -1,10 +1,10 @@
-package com.model.logic;
+package com.model.view;
+
+import com.model.logic.Node;
 
 public class DocResult implements Comparable<DocResult> {
 
     private final String link;
-    
-    public Node expression;
     private double relevance;
 
     public DocResult(String link, double relevance) {

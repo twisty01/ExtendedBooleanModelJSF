@@ -1,6 +1,5 @@
 package com.model.view;
 
-import com.model.logic.DocResult;
 import com.model.logic.Evaluator;
 import com.model.logic.TermLoader;
 import java.io.Serializable;
@@ -28,16 +27,18 @@ public class BooleanModel implements Serializable {
 
     /* include magic here */
     public void evaulate() {
-
         duration = System.nanoTime();
-        if (!simpleSearch) {
-            Evaluator evaluator = new Evaluator();
-            evaluator.setTermLoader(termLoader);
-            evaluator.evaluate(expression);
-            results = evaluator.getResults();
-        } else {
-            // todo 
+        Evaluator evaluator = new Evaluator();
+        evaluator.setTermLoader(termLoader);
+        if (!evaluator.parse(expression)) {
+            return;
         }
+        if (!simpleSearch) {
+            evaluator.evaluate();
+        } else {
+            evaluator.evaluateSimple();
+        }
+        results = evaluator.getResults();
         duration = System.nanoTime() - duration;
         duration /= 1000;
         // show results

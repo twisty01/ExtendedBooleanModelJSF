@@ -1,14 +1,26 @@
 package com.model.logic;
 
+import com.model.view.DocResult;
+import com.porter.Stemmer;
+import java.io.File;
+import java.io.FileNotFoundException;
 import static java.lang.Math.sqrt;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Scanner;
 import java.util.Set;
+import java.util.function.BiConsumer;
+import java.util.function.BiFunction;
 import java.util.regex.Pattern;
 
 public class Evaluator {
@@ -30,7 +42,7 @@ public class Evaluator {
 
     private TermLoader termLoader;
 
-    private boolean parse(String expression) {
+    public boolean parse(String expression) {
         atoms = new LinkedList<>(Arrays.asList(expression
                 .toLowerCase()
                 .replaceAll(andQ, " && ")
@@ -43,6 +55,12 @@ public class Evaluator {
                 .split(" ")));
         if (!checkPars()) {
             return false;
+        }
+        for (ListIterator<String> it = atoms.listIterator(); it.hasNext();) {
+            String atom = it.next();
+            if (!OPs.contains(atom)) {
+                it.set(Stemmer.stem(atom));
+            }
         }
         addANDs();
         //if (!checkOPs(atoms.listIterator())) {
@@ -201,6 +219,9 @@ public class Evaluator {
 
     private double getWeight(int idx, String term) {
         List<DocTermValue> list = termLoader.getDocValueByTerm(term);
+        if (list == null) {
+            return 0;
+        }
         /*
          int i = Collections.binarySearch(list, new DocTermValue(idx, 0));
          if (i < 0) {
@@ -217,13 +238,7 @@ public class Evaluator {
         return 0;
     }
 
-    /// --------------------------------------
-    public boolean evaluate(String expression) {
-        if (!parse(expression)) {
-            return false;
-        }
-        // todo evalute
-        // every doc evaluate recursively
+    public void evaluate() {
         results = termLoader.createResults();
         for (int i = 0; i < results.size(); i++) {
             DocResult r = results.get(i);
@@ -238,9 +253,97 @@ public class Evaluator {
                 return 0;
             }
         });
-        return true;
     }
 
+    private boolean recEvaluateSimple(HashMap<String, Integer> termsInExp, ListIterator<String> l) {
+        boolean conjunction = true;
+        boolean nextIsNegation = false;
+        int t = 0;
+        while (l.hasNext()) {
+            String curAtom = l.next();
+            t++;
+            if (curAtom.equals(OR)) {
+                conjunction = false;
+                break;
+            } else if (curAtom.equals(AND)) {
+                conjunction = true;
+                break;
+            }
+        }
+        for (int i = 0; i < t; i++) {
+            l.previous();
+        }
+        int parCount = 0;
+        while (l.hasNext()) {
+            String curAtom = l.next();
+            if (!OPs.contains(curAtom)) {
+                if ((conjunction && nextIsNegation) || (!conjunction && !nextIsNegation)) {
+                } else {
+                }
+            } else {
+                if (curAtom.equals(NOT)) {
+                    nextIsNegation = !nextIsNegation;
+                } else if (curAtom.equals(OP_PAR)) {
+                    if ((conjunction && nextIsNegation) || (!conjunction && !nextIsNegation)) {
+                    } else {
+                    }
+                } else if (curAtom.equals(CL_PAR)) {
+                    break;
+                } else if (curAtom.equals(AND) || curAtom.equals(OR)) {
+                    nextIsNegation = false;
+                }
+            }
+        }
+        return true;
+
+    }
+
+    public void evaluateSimple() {
+        HashMap<String, Integer> termsInExp = new HashMap<>();
+        for (String atom : atoms) {
+            if (!OPs.contains(atom)) {
+                termsInExp.put(atom, 0);
+            }
+        }
+        results = new ArrayList<>();
+        for (String path : termLoader.getDocuments()) {
+            Scanner scn = null;
+            try {
+                File file = new File(path);
+                scn = new Scanner(file).useDelimiter("[^a-zA-Z]+");
+            } catch (FileNotFoundException ex) {
+            }
+            while (scn.hasNext()) {
+                String word = scn.next().trim().toLowerCase();
+                if (termLoader.isTerm(word)) {
+                    String term = Stemmer.stem(word);
+                    if (termsInExp.containsKey(term)) {
+                        termsInExp.replace(term, termsInExp.get(term));
+                    }
+                }
+            }
+            scn.close();
+            if (recEvaluateSimple(termsInExp, atoms.listIterator())) {
+                results.add(new DocResult(DocResult.pathToLink(path), 0));
+            }
+            for (Iterator<Map.Entry<String, Integer>> it = termsInExp.entrySet().iterator(); it.hasNext();) {
+                Entry<String, Integer> entry = it.next();
+                entry.setValue(0);
+            }
+        }
+
+        results.sort((DocResult o1, DocResult o2) -> {
+            if (o1.getRelevance() - o2.getRelevance() < 0) {
+                return 1;
+            } else if (o1.getRelevance() - o2.getRelevance() > 0) {
+                return -1;
+            } else {
+                return 0;
+            }
+        });
+    }
+
+    /// --------------------------------------
     public void setTermLoader(TermLoader termLoader) {
         this.termLoader = termLoader;
     }
