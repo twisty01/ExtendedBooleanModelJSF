@@ -56,7 +56,7 @@ public class TermLoader implements Serializable {
             File file = new File(path);
             Scanner scn = null;
             try {
-                scn = new Scanner(file).useDelimiter("[^a-zA-Z]");
+                scn = new Scanner(file).useDelimiter("[^a-zA-Z]+");
             } catch (FileNotFoundException ex) {
             }
             HashMap<String, Integer> tmp = new HashMap<>();

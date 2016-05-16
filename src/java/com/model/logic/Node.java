@@ -2,6 +2,7 @@ package com.model.logic;
 
 import java.util.List;
 
+@Deprecated
 public class Node {
 
     public Node parent;
@@ -32,7 +33,6 @@ public class Node {
             }
             value += n.value;
         }
-
     }
 
 }

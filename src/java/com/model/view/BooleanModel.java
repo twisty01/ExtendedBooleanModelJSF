@@ -40,7 +40,7 @@ public class BooleanModel implements Serializable {
         }
         results = evaluator.getResults();
         duration = System.nanoTime() - duration;
-        duration /= 1000;
+        duration /= 1000000;
         // show results
         reset();
         resultsVisibility = "block";

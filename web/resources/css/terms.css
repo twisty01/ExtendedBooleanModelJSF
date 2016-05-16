@@ -5,16 +5,19 @@
     margin-bottom: 0.5em;
 }
 .header h1 {
-    display: inline-block;
+    display: block;
     font-size: 1.6em;
     margin: 0 auto;
+    margin-bottom: 0;
     padding: 0.5em;
+    padding-bottom: 0;
 }
 .header label {
     display: inline-block;
     text-align: center;
     color: #333;
     font-size:1em;
+    margin-bottom: 1em;
 }
 .header h2{
     font-size: 1.2em;

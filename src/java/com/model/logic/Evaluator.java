@@ -7,8 +7,6 @@ import java.io.FileNotFoundException;
 import static java.lang.Math.sqrt;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -19,8 +17,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Scanner;
 import java.util.Set;
-import java.util.function.BiConsumer;
-import java.util.function.BiFunction;
 import java.util.regex.Pattern;
 
 public class Evaluator {
@@ -139,14 +135,13 @@ public class Evaluator {
         return true;
     }
 
-    private ListIterator<String> recConvertToANDs(ListIterator<String> l) {
-        return l;
-    }
+    /*private ListIterator<String> recConvertToANDs(ListIterator<String> l) {
+     return l;
+     }
 
-    private boolean checkOPs(ListIterator<String> l) {
-        return true;
-    }
-
+     private boolean checkOPs(ListIterator<String> l) {
+     return true;
+     }*/
     private void addANDs() {
         String last = AND;
         ListIterator<String> l = atoms.listIterator();
@@ -256,6 +251,7 @@ public class Evaluator {
     }
 
     private boolean recEvaluateSimple(HashMap<String, Integer> termsInExp, ListIterator<String> l) {
+        boolean value = true;
         boolean conjunction = true;
         boolean nextIsNegation = false;
         int t = 0;
@@ -263,10 +259,12 @@ public class Evaluator {
             String curAtom = l.next();
             t++;
             if (curAtom.equals(OR)) {
+                value = false;
                 conjunction = false;
                 break;
             } else if (curAtom.equals(AND)) {
                 conjunction = true;
+                value = true;
                 break;
             }
         }
@@ -277,24 +275,49 @@ public class Evaluator {
         while (l.hasNext()) {
             String curAtom = l.next();
             if (!OPs.contains(curAtom)) {
-                if ((conjunction && nextIsNegation) || (!conjunction && !nextIsNegation)) {
+                if (conjunction) {
+                    if ((!nextIsNegation && termsInExp.get(curAtom) == 0) || (nextIsNegation && termsInExp.get(curAtom) > 0)) {
+                        value = false;
+                        break;
+                    }
                 } else {
+                    if ((!nextIsNegation && termsInExp.get(curAtom) > 0) || (nextIsNegation && termsInExp.get(curAtom) == 0)) {
+                        value = true;
+                        break;
+                    }
                 }
             } else {
                 if (curAtom.equals(NOT)) {
                     nextIsNegation = !nextIsNegation;
                 } else if (curAtom.equals(OP_PAR)) {
-                    if ((conjunction && nextIsNegation) || (!conjunction && !nextIsNegation)) {
+                    boolean tmp = recEvaluateSimple(termsInExp, l);
+                    if (conjunction) {
+                        if ((!nextIsNegation && !tmp) || (nextIsNegation && tmp)) {
+                            value = false;
+                            break;
+                        }
                     } else {
+                        if ((!nextIsNegation && tmp) || (nextIsNegation && tmp)) {
+                            value = true;
+                            break;
+                        }
                     }
                 } else if (curAtom.equals(CL_PAR)) {
-                    break;
+                    return value;
                 } else if (curAtom.equals(AND) || curAtom.equals(OR)) {
                     nextIsNegation = false;
                 }
             }
         }
-        return true;
+        while (parCount != 0 && l.hasNext()) {
+            String curAtom = l.next();
+            if (curAtom.equals(OP_PAR)) {
+                parCount++;
+            } else if (curAtom.equals(CL_PAR)) {
+                parCount--;
+            }
+        }
+        return value;
 
     }
 
@@ -318,7 +341,7 @@ public class Evaluator {
                 if (termLoader.isTerm(word)) {
                     String term = Stemmer.stem(word);
                     if (termsInExp.containsKey(term)) {
-                        termsInExp.replace(term, termsInExp.get(term));
+                        termsInExp.replace(term, termsInExp.get(term) + 1);
                     }
                 }
             }
@@ -331,7 +354,6 @@ public class Evaluator {
                 entry.setValue(0);
             }
         }
-
         results.sort((DocResult o1, DocResult o2) -> {
             if (o1.getRelevance() - o2.getRelevance() < 0) {
                 return 1;

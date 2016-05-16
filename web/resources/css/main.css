@@ -39,6 +39,9 @@
     background-color: #f9f9f9;
     border: 0.04em solid #cccccc;
 }
+.search input{
+    width: 20em;
+}
 .search a{
     background-color: #eeeeee;
 }
